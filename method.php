@@ -131,7 +131,7 @@ Class ConnectMySQL {
    * テーブルすべてのレコードをselect実行する
    */
   public function selectAll(){
-    $sql = 'SELECT id,name,typeStr,published FROM '.TABLE;
+    $sql = 'SELECT id,parentId,name,typeStr,published FROM '.TABLE;
     return $this->doSelect($sql);
   }
 
@@ -139,7 +139,7 @@ Class ConnectMySQL {
    * 引数の公開設定がされているレコードをselect実行する
    */
   public function selectVisible($flag){
-    $sql = 'SELECT id,name,typeStr,published FROM '.TABLE.' WHERE published=b\''.$flag.'\'';
+    $sql = 'SELECT id,parentId,name,typeStr,published FROM '.TABLE.' WHERE published=b\''.$flag.'\'';
     return $this->doSelect($sql);
   }
 
@@ -147,7 +147,7 @@ Class ConnectMySQL {
    * 引数の公開設定がされているノードレコードをselect実行する
    */
   public function selectNodeVisible($flag){
-    $sql = 'SELECT id,name,typeStr,published FROM '.TABLE.' WHERE  typeStr="NODE" AND published=b\''.$flag.'\'';
+    $sql = 'SELECT id,parentId,name,typeStr,published FROM '.TABLE.' WHERE  typeStr="NODE" AND published=b\''.$flag.'\'';
     return $this->doSelect($sql);
   }
 
@@ -155,7 +155,7 @@ Class ConnectMySQL {
    * 引数の問題設定がされているノードではないレコードをselect実行する
    */
   public function selectPageVisible($flag){
-    $sql = 'SELECT id,name,typeStr,published FROM '.TABLE.' WHERE  typeStr<>"NODE" AND published=b\''.$flag.'\'';
+    $sql = 'SELECT id,parentId,name,typeStr,published FROM '.TABLE.' WHERE  typeStr<>"NODE" AND published=b\''.$flag.'\'';
     return $this->doSelect($sql);
   }
 

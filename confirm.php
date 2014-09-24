@@ -5,7 +5,7 @@
  * 【移動先】実行の場合 change.php
  */
 session_start();
-
+// error_reporting(-1);
 require_once 'method.php';
 $srv = new Page();
 $srv->printOpenHeader();
@@ -33,8 +33,10 @@ else if($_SESSION['parentId']==null){
 }
 
 // id.phpのpostデータ受け取り
-$visible = $_POST['visible'];
-$invisible = $_POST['invisible'];
+$visible = null;
+$invisible = null;
+if(isset($_POST['visible'])) $visible = $_POST['visible'];
+if(isset($_POST['invisible'])) $invisible = $_POST['invisible'];
 
 // change.php引き継ぐため、session変数へのデータ格納
 $_SESSION['visible'] = $visible;
