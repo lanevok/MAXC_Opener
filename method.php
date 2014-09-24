@@ -93,7 +93,7 @@ Class ConnectMySQL {
    * 指定された親idを持つレコードをselect実行する
    */
   public function selectL($l){
-    $sql = 'SELECT id,name,typeStr,published FROM '.TABLE.' WHERE parentId='.$l;
+    $sql = 'SELECT id,parentId,name,typeStr,published FROM '.TABLE.' WHERE parentId='.$l;
     return $this->doSelect($sql);
   }
 

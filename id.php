@@ -21,8 +21,9 @@ if($_SESSION['login']==""||!isset($_SESSION['login'])){
 }
 
 // 処理階層の取得と保存
-$id = $_GET['parentId'];
-if($id==null||$id=="") $id=0;
+$id = null;
+if(isset($_GET['parentId'])) $id = $_GET['parentId'];
+if($id==null) $id=0;
 $_SESSION['parentId'] = $id;
 
 print("<script type=\"text/javascript\">
