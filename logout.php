@@ -13,7 +13,7 @@ $srv->printCloseHeader();
 $_SESSION['login'] = array();
 $_SESSION['visible'] = array();
 $_SESSION['invisible'] = array();
-$_SESSION['pid'] = array();
+$_SESSION['parentId'] = array();
 if(isset($_COOKIE['login'])){
   setcookie("login",'',time()-86400,'/');
 }

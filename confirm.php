@@ -18,13 +18,13 @@ if($_SESSION['login']==""||!isset($_SESSION['login'])){
   $_SESSION['login'] = array();
   $_SESSION['visible'] = array();
   $_SESSION['invisible'] = array();
-  $_SESSION['pid'] = array();
+  $_SESSION['parentId'] = array();
   session_destroy();
   exit();
 }
-else if($_SESSION['pid']==null){
+else if($_SESSION['parentId']==null){
   // データベースへの変更後、不適切な遷移に対する処理
-  // (一度change.phpが実行されるとsession変数のpidが除去される仕掛け)
+  // (一度change.phpが実行されるとsession変数のparentIdが除去される仕掛け)
   print "<p>戻るボタンなどでリロードはできません</p>";
   $_SESSION['visible'] = array();
   $_SESSION['invisible'] = array();
@@ -72,7 +72,7 @@ $print_array = null;
 for($i=0; $i<count($visible); $i++){
   foreach($ans2 as $data) {
     if ($data['id']==$visible[$i]) {
-      $print_array[$array_idx++] = array("id"=>$visible[$i],"title"=>$data['title']);
+      $print_array[$array_idx++] = array("id"=>$visible[$i],"name"=>$data['name']);
     }
   }
 }
@@ -85,7 +85,7 @@ $print_array = null;
 for($i=0; $i<count($invisible); $i++){
   foreach($ans2 as $data) {
     if ($data['id']==$invisible[$i]) {
-      $print_array[$array_idx++] = array("id"=>$invisible[$i],"title"=>$data['title']);
+      $print_array[$array_idx++] = array("id"=>$invisible[$i],"name"=>$data['name']);
     }
   }
 }
@@ -94,7 +94,7 @@ $b->printConfirm($print_array, true);
 // 変更前の可視id取得
 // print "<hr>before<br><br>";
 $idx1 = 0;
-$req[0] = array("id"=>0,"title"=>"");
+$req[0] = array("id"=>0,"name"=>"");
 while(true){
   $res = $a->multiSelectL($req);
   $req = null;
@@ -116,7 +116,7 @@ if($req!=null){
 // print "<hr>after<br><br>";
 $idx2 = 0;
 $req = null;
-$req[0] = array("id"=>0,"title"=>"");
+$req[0] = array("id"=>0,"name"=>"");
 while(true){
   $res = $a->multiSelectL($req);
   $req = null;
@@ -140,7 +140,7 @@ $array_idx = 0;
 $print_array = null;
 for($i=0; $i<count($a_res); $i++){
   if($b_res==null||!in_array($a_res[$i], $b_res)){
-    $print_array[$array_idx++] = array("id"=>$a_res[$i]['id'],"title"=>$a_res[$i]['title']);
+    $print_array[$array_idx++] = array("id"=>$a_res[$i]['id'],"name"=>$a_res[$i]['name']);
   }
 }
 $b->printConfirm($print_array, false);
@@ -151,7 +151,7 @@ $array_idx = 0;
 $print_array = null;
 for($i=0; $i<count($b_res); $i++){
   if($a_res==null||!in_array($b_res[$i], $a_res)){
-    $print_array[$array_idx++] = array("id"=>$b_res[$i]['id'],"title"=>$b_res[$i]['title']);
+    $print_array[$array_idx++] = array("id"=>$b_res[$i]['id'],"name"=>$b_res[$i]['name']);
   }
 }
 $b->printConfirm($print_array, true);
@@ -160,4 +160,4 @@ print_r("<br><br>\n");
 print_r("<form action=\"change.php\" method=\"post\">");
 print_r("<button type=\"submit\">変更</button>");
 print_r("</form>");
-print_r("<a href=\"./id.php?pid=".$_SESSION['pid']."\">戻る</a>");
+print_r("<a href=\"./id.php?parentId=".$_SESSION['parentId']."\">戻る</a>");

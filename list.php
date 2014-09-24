@@ -23,7 +23,7 @@ if($_SESSION['login']==""||!isset($_SESSION['login'])){
 
 // 処理モードの取得と処理階層の仮想保存
 $pro = $_GET['pro'];
-$_SESSION['pid'] = "0";
+$_SESSION['parentId'] = "0";
 
 print("<script type=\"text/javascript\">
 <!--

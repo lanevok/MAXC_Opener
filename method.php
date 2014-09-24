@@ -14,9 +14,17 @@ Class ConnectMySQL {
       $dsn = 'mysql:dbname='.SCHEMA.';host='.HOST;
       $options = array(
 		       PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8',
-		       PDO::ATTR_PERSISTENT => true
+		       //					PDO::ATTR_PERSISTENT => true
 		       );
-      $this->dbh = new PDO($dsn, USER, PASSWORD, $options);
+      try {
+	$this->dbh = new PDO($dsn, USER, PASSWORD, $options);
+      } catch (Exception $e) {
+	print_r("<script type=\"text/javascript\">
+				<!--
+				console.log(\"pdo construct warning?\");
+				//-->
+				</script>");
+      }
       if ($this->dbh == null){
 	print('データベースへの接続ができませんでした');
 	die();
@@ -85,7 +93,7 @@ Class ConnectMySQL {
    * 指定された親idを持つレコードをselect実行する
    */
   public function selectL($l){
-    $sql = 'SELECT id,title,type,published FROM '.TABLE.' WHERE pid='.$l;
+    $sql = 'SELECT id,name,typeStr,published FROM '.TABLE.' WHERE parentId='.$l;
     return $this->doSelect($sql);
   }
 
@@ -93,9 +101,9 @@ Class ConnectMySQL {
    * 指定された親id配列の要素いずれかを持つレコードをselect実行する
    */
   public function multiSelectL($l){
-    $sql = 'SELECT id,title,type,published FROM '.TABLE.' WHERE pid='.$l[0]['id'];
+    $sql = 'SELECT id,name,typeStr,published FROM '.TABLE.' WHERE parentId='.$l[0]['id'];
     for($i=1; $i<count($l); $i++){
-      $sql = $sql . ' or pid=' . $l[$i]['id'];
+      $sql = $sql . ' or parentId=' . $l[$i]['id'];
     }
     return $this->doSelect($sql);
   }
@@ -104,7 +112,7 @@ Class ConnectMySQL {
    * 指定されたid配列の要素いずれかを持つレコードをselect実行する
    */
   public function multiSelect($l){
-    $sql = 'SELECT id,title,type,published FROM '.TABLE.' WHERE id='.$l[0]['id'];
+    $sql = 'SELECT id,name,typeStr,published FROM '.TABLE.' WHERE id='.$l[0]['id'];
     for($i=1; $i<count($l); $i++){
       $sql = $sql . ' or id=' . $l[$i]['id'];
     }
@@ -115,7 +123,7 @@ Class ConnectMySQL {
    * 指定されたidを持つレコードをselect実行する
    */
   public function selectLnode($l){
-    $sql = 'SELECT id,pid,title,type,published FROM '.TABLE.' WHERE id='.$l;
+    $sql = 'SELECT id,parentId,name,typeStr,published FROM '.TABLE.' WHERE id='.$l;
     return $this->doSelect($sql);
   }
 
@@ -123,7 +131,7 @@ Class ConnectMySQL {
    * テーブルすべてのレコードをselect実行する
    */
   public function selectAll(){
-    $sql = 'SELECT id,title,type,published FROM '.TABLE;
+    $sql = 'SELECT id,name,typeStr,published FROM '.TABLE;
     return $this->doSelect($sql);
   }
 
@@ -131,7 +139,7 @@ Class ConnectMySQL {
    * 引数の公開設定がされているレコードをselect実行する
    */
   public function selectVisible($flag){
-    $sql = 'SELECT id,title,type,published FROM '.TABLE.' WHERE published=b\''.$flag.'\'';
+    $sql = 'SELECT id,name,typeStr,published FROM '.TABLE.' WHERE published=b\''.$flag.'\'';
     return $this->doSelect($sql);
   }
 
@@ -139,7 +147,7 @@ Class ConnectMySQL {
    * 引数の公開設定がされているノードレコードをselect実行する
    */
   public function selectNodeVisible($flag){
-    $sql = 'SELECT id,title,type,published FROM '.TABLE.' WHERE  type="NODE" AND published=b\''.$flag.'\'';
+    $sql = 'SELECT id,name,typeStr,published FROM '.TABLE.' WHERE  typeStr="NODE" AND published=b\''.$flag.'\'';
     return $this->doSelect($sql);
   }
 
@@ -147,52 +155,52 @@ Class ConnectMySQL {
    * 引数の問題設定がされているノードではないレコードをselect実行する
    */
   public function selectPageVisible($flag){
-    $sql = 'SELECT id,title,type,published FROM '.TABLE.' WHERE  type<>"NODE" AND published=b\''.$flag.'\'';
+    $sql = 'SELECT id,name,typeStr,published FROM '.TABLE.' WHERE  typeStr<>"NODE" AND published=b\''.$flag.'\'';
     return $this->doSelect($sql);
   }
 
   /**
-   * sql結果から、公開設定されているidとtitleを配列で取得する
+   * sql結果から、公開設定されているidとnameを配列で取得する
    */
   function getIDs($stmt){
     $idx = 0;
     if($stmt->rowCount()==0) return -1;
     while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
-      if((int)bin2hex($result['published'])===1){
-	$answer[$idx++] = array("id"=>$result['id'],"title"=>$result['title']);
+      if(ord($result['published'])){
+	$answer[$idx++] = array("id"=>$result['id'],"name"=>$result['name']);
       }
     }
     return $answer;
   }
 
   /**
-   * sql結果から、idとtitleを配列で取得する
+   * sql結果から、idとnameを配列で取得する
    */
   function getTitle($stmt){
     $idx = 0;
     if($stmt->rowCount()==0) return -1;
     while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
-      $answer[$idx++] = array("id"=>$result['id'],"title"=>$result['title']);
+      $answer[$idx++] = array("id"=>$result['id'],"name"=>$result['name']);
     }
     return $answer;
   }
 
   /**
    * sql結果と、公開するレコード配列、非公開にするレコード配列を用いて
-   * 実際にその階層で可視状態であるレコードのidとtitleを配列で取得する
+   * 実際にその階層で可視状態であるレコードのidとnameを配列で取得する
    */
   function getIDs_compare($stmt, $visible, $invisible){
     $idx = 0;
     if($stmt->rowCount()==0) return -1;
     while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
       if($visible!=null&&in_array($result['id'], $visible)){
-	$answer[$idx++] = array("id"=>$result['id'],"title"=>$result['title']);
+	$answer[$idx++] = array("id"=>$result['id'],"name"=>$result['name']);
       }
       else if($invisible!=null&&in_array($result['id'], $invisible)){
 	continue;
       }
-      else if((int)bin2hex($result['published'])===1){
-	$answer[$idx++] = array("id"=>$result['id'],"title"=>$result['title']);
+      else if(ord($result['published'])){
+	$answer[$idx++] = array("id"=>$result['id'],"name"=>$result['name']);
       }
     }
     return $answer;
@@ -214,24 +222,32 @@ Class Page{
     print("<table border=\"1\">");
     while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
       print("<tr>");
-      if((int)bin2hex($result['published'])===1) print("<tr bgcolor=\"AFEEEE\">");
-      if((int)bin2hex($result['published'])===0) print("<tr bgcolor=\"EFA18F\">");
+      // 			if((int)bin2hex($result['published'])==1) print("<tr bgcolor=\"AFEEEE\">");
+      // 			if((int)bin2hex($result['published'])==0) print("<tr bgcolor=\"EFA18F\">");
+      // 			var_dump(ord($result['published']));
+      print_r("<script type=\"text/javascript\">
+			<!--
+			console.log(\"".ord($result['published'])."\");
+			//-->
+			</script>");
+      if(ord($result['published'])) print("<tr bgcolor=\"AFEEEE\">");		//blue
+      if(!ord($result['published'])) print("<tr bgcolor=\"EFA18F\">");		//red
       print("<td>");	print($result['id']);			print("</td>\n");
       print("<td>");
-      if(!$flag&&$result['type']=="NODE"){
-	print "<a href=\"./id.php?pid=";
+      if(!$flag&&$result['typeStr']=="NODE"){
+	print "<a href=\"./id.php?parentId=";
 	print ($result['id']);
 	print "\">";
       }
-      print($result['title']);	print "</a>";		print("</td>\n");
+      print($result['name']);	print "</a>";		print("</td>\n");
       print("<td>on");	print("<input type=\"checkbox\" name=\"visible[]\" value=\"".$result['id']."\""
-			      .((int)bin2hex($result['published'])===1?" disabled":"").">");
+			      .(ord($result['published'])?" disabled":"").">");
       print("</td>\n");
       print("<td>off");	print("<input type=\"checkbox\" name=\"invisible[]\" value=\"".$result['id']."\""
-			      .((int)bin2hex($result['published'])===0?" disabled":"").">");
+			      .(!ord($result['published'])?" disabled":"").">");
       print("</td>\n");
       print("</tr>\n");
-      $res = $result['pid'];
+      $res = $result['parentId'];
     }
     print("</table>");
     return $res;
@@ -254,7 +270,7 @@ Class Page{
       if(!$visibleFlag) print("<tr bgcolor=\"EFA18F\">");
       print("<td>");	print($array[$i]['id']);			print("</td>");
       print("<td>");
-      print($array[$i]['title']);
+      print($array[$i]['name']);
       print("</td>");
       print("</tr>\n");
     }

@@ -21,9 +21,9 @@ if($_SESSION['login']==""||!isset($_SESSION['login'])){
 }
 
 // 処理階層の取得と保存
-$id = $_GET['pid'];
+$id = $_GET['parentId'];
 if($id==null||$id=="") $id=0;
-$_SESSION['pid'] = $id;
+$_SESSION['parentId'] = $id;
 
 print("<script type=\"text/javascript\">
 <!--
@@ -54,7 +54,7 @@ $b->printSelect($result,false);
 print "<br><br>";
 
 if($id!=0){
-  print "<a href=\"./id.php?pid=".$res."\">上の階層へ戻る</a><br><br>";
+  print "<a href=\"./id.php?parentId=".$res."\">上の階層へ戻る</a><br><br>";
 }
 print("<p>◎タイトルのリンクをクリックすることで、その階層を展開できます。</p>\n");
 print("<p>◎背景色が現在の状態です。　<b><font color=\"#AFDDFF\">公開中</font>　<font color=\"#FFA18F\">非公開</font></b></p>\n");
