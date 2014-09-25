@@ -44,6 +44,11 @@ Class ConnectMySQL {
       $this->dbh->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
       $this->dbh->beginTransaction();
       for($i=0; $i<count($sql); $i++){
+	print_r("<script type=\"text/javascript\">
+				<!--
+				console.log(\"".$sql[$i]."\");
+				//-->
+				</script>");
 	$this->dbh->exec($sql[$i]);
       }
       $this->dbh->commit();
@@ -166,7 +171,10 @@ Class ConnectMySQL {
     $idx = 0;
     if($stmt->rowCount()==0) return -1;
     while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
-      if(ord($result['published'])){
+      if(ord($result['published'])>1) 
+	$result['published'] = ord($result['published'])-48;
+      else $result['published'] = ord($result['published']);
+      if($result['published']){
 	$answer[$idx++] = array("id"=>$result['id'],"name"=>$result['name']);
       }
     }
@@ -199,8 +207,13 @@ Class ConnectMySQL {
       else if($invisible!=null&&in_array($result['id'], $invisible)){
 	continue;
       }
-      else if(ord($result['published'])){
-	$answer[$idx++] = array("id"=>$result['id'],"name"=>$result['name']);
+      else{
+	if(ord($result['published'])>1) 
+	  $result['published'] = ord($result['published'])-48;
+	else $result['published'] = ord($result['published']);
+	if($result['published']){
+	  $answer[$idx++] = array("id"=>$result['id'],"name"=>$result['name']);
+	}
       }
     }
     return $answer;
@@ -225,13 +238,16 @@ Class Page{
       // 			if((int)bin2hex($result['published'])==1) print("<tr bgcolor=\"AFEEEE\">");
       // 			if((int)bin2hex($result['published'])==0) print("<tr bgcolor=\"EFA18F\">");
       // 			var_dump(ord($result['published']));
+      if(ord($result['published'])>1)
+	$result['published'] = ord($result['published'])-48;
+      else $result['published'] = ord($result['published']);
       print_r("<script type=\"text/javascript\">
 			<!--
-			console.log(\"".ord($result['published'])."\");
+			console.log(\"".$result['published']."\");
 			//-->
 			</script>");
-      if(ord($result['published'])) print("<tr bgcolor=\"AFEEEE\">");		//blue
-      if(!ord($result['published'])) print("<tr bgcolor=\"EFA18F\">");		//red
+      if($result['published']) print("<tr bgcolor=\"AFEEEE\">");		//blue
+      if(!$result['published']) print("<tr bgcolor=\"EFA18F\">");		//red
       print("<td>");	print($result['id']);			print("</td>\n");
       print("<td>");
       if(!$flag&&$result['typeStr']=="NODE"){
@@ -241,10 +257,10 @@ Class Page{
       }
       print($result['name']);	print "</a>";		print("</td>\n");
       print("<td>on");	print("<input type=\"checkbox\" name=\"visible[]\" value=\"".$result['id']."\""
-			      .(ord($result['published'])?" disabled":"").">");
+			      .($result['published']?" disabled":"").">");
       print("</td>\n");
       print("<td>off");	print("<input type=\"checkbox\" name=\"invisible[]\" value=\"".$result['id']."\""
-			      .(!ord($result['published'])?" disabled":"").">");
+			      .(!$result['published']?" disabled":"").">");
       print("</td>\n");
       print("</tr>\n");
       $res = $result['parentId'];
