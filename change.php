@@ -5,7 +5,7 @@
  * 【移動先】confirm.phpの前に開いていたid.php
  */
 session_start();
-
+error_reporting(-1);
 require_once 'method.php';
 $srv = new Page();
 $srv->printOpenHeader();
@@ -37,6 +37,14 @@ $visible = $_SESSION['visible'];
 $invisible = $_SESSION['invisible'];
 $_SESSION['visible'] = array();
 $_SESSION['invisible'] = array();
+
+// 不正なリロードによる空updateリクエストの抑制
+if(count($visible)==0&&count($invisible)==0){
+  print "<p>不正なリクエストを事前に検知したので終了しました</p>";
+  $_SESSION['parentId'] = null;
+  print "<a href=\"./id.php\">戻る</a>";
+  exit();
+}
 
 // アップデートの実行
 $a = new ConnectMySQL();
