@@ -4,6 +4,7 @@
  * 【移動先】auth.php
  */
 session_start();
+error_reporting(-1);
 // セッションの初期化
 $_SESSION['login'] = array();
 $_SESSION['visible'] = array();
@@ -16,7 +17,7 @@ $srv->printOpenHeader();
 $srv->printCloseHeader();
 print_r("<body>\n");
 print_r("<h2>MAX/C問題公開ツール</h2>\n");
-print_r("<p>Version 2.12 (2014/09/26)</p><br>\n");
+print_r("<p>Version 2.13 (2014/09/28)</p><br>\n");
 print_r("<form action=\"auth.php\" method=\"post\">\n");
 print_r("<p>アプリケーションパスワードを入力してください。</p>\n");
 print_r("<input type=\"password\" name=\"pw\"><br><br>\n");

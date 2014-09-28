@@ -6,12 +6,12 @@
  * 【移動先】「変更確認へ」クリック時、confirm.php
  */
 session_start();
-
+error_reporting(-1);
 require_once 'method.php';
 $srv = new Page();
 $srv->printOpenHeader();
 
-if($_SESSION['login']==""||!isset($_SESSION['login'])){
+if(!isset($_SESSION['login'])||$_SESSION['login']==""||!isset($_SESSION['login'])){
   // ログインセッションが実行されていない
   print "<p>認証されていません</p>";
   print "<p><a href=\"./index.php\">認証へ</a></p>";
@@ -23,7 +23,7 @@ if($_SESSION['login']==""||!isset($_SESSION['login'])){
 // 処理階層の取得と保存
 $id = null;
 if(isset($_GET['parentId'])) $id = $_GET['parentId'];
-if($id==null) $id=0;
+if($id==null) $id="0";
 $_SESSION['parentId'] = $id;
 
 print("<script type=\"text/javascript\">

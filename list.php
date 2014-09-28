@@ -6,7 +6,7 @@
  * 【移動先】「変更確認へ」クリック時、confirm.php
  */
 session_start();
-
+error_reporting(-1);
 require_once 'method.php';
 $srv = new Page();
 $srv->printOpenHeader();

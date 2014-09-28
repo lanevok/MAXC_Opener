@@ -1,4 +1,5 @@
 <?php
+error_reporting(-1);
 require_once 'config.php';
 /**
  * MySQLデータベースと接続し操作するクラス
@@ -171,13 +172,14 @@ Class ConnectMySQL {
     $idx = 0;
     if($stmt->rowCount()==0) return -1;
     while($result = $stmt->fetch(PDO::FETCH_ASSOC)){
-      if(ord($result['published'])>1) 
+      if(ord($result['published'])>1)
 	$result['published'] = ord($result['published'])-48;
       else $result['published'] = ord($result['published']);
       if($result['published']){
 	$answer[$idx++] = array("id"=>$result['id'],"name"=>$result['name']);
       }
     }
+    if(!isset($answer)) $answer = null;
     return $answer;
   }
 
@@ -208,7 +210,7 @@ Class ConnectMySQL {
 	continue;
       }
       else{
-	if(ord($result['published'])>1) 
+	if(ord($result['published'])>1)
 	  $result['published'] = ord($result['published'])-48;
 	else $result['published'] = ord($result['published']);
 	if($result['published']){
@@ -216,6 +218,7 @@ Class ConnectMySQL {
 	}
       }
     }
+    if(!isset($answer)) $answer = null;
     return $answer;
   }
 }
@@ -302,7 +305,7 @@ Class Page{
     print_r("<title>MAX/C問題公開ツール</title>\n");
     print_r("<meta name=\"Author\" content=\"Koike Tatsuya\">\n");
     print_r("<meta name=\"robots\" content=\"noindex,nofollow\">\n");
-    print_r("<meta name=\"description\" content=\"MAX/C問題の公開を簡単に公開するためのツール\">\n");
+    print_r("<meta name=\"description\" content=\"MAX/C問題の公開を簡単にするためのツール\">\n");
     print_r("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n");
   }
 

@@ -5,7 +5,7 @@
  * 【移動先】実行の場合 change.php
  */
 session_start();
-// error_reporting(-1);
+error_reporting(-1);
 require_once 'method.php';
 $srv = new Page();
 $srv->printOpenHeader();
@@ -45,6 +45,7 @@ $_SESSION['invisible'] = $invisible;
 // 変更がチェックされているか確認
 if(count($visible)+count($invisible)==0){
   print "何も選択されていません";
+  print "<br><br><a href=\"./id.php?parentId=".$_SESSION['parentId']."\">戻る</a><br><br>";
   exit(0);
 }
 
@@ -140,8 +141,9 @@ print "<hr>③　↓この変更の影響でcloseされる(見えなくなる)�
 // 変更前のidが変更後集合になければ、そのidは不可視になる
 $array_idx = 0;
 $print_array = null;
+if(!isset($a_res)) $a_res = null;
 for($i=0; $i<count($a_res); $i++){
-  if($b_res==null||!in_array($a_res[$i], $b_res)){
+  if(!isset($b_res)||$b_res==null||!in_array($a_res[$i], $b_res)){
     $print_array[$array_idx++] = array("id"=>$a_res[$i]['id'],"name"=>$a_res[$i]['name']);
   }
 }
@@ -151,8 +153,9 @@ print "<hr>④　↓この変更の影響でopenされる(見えるようにな�
 // 変更後のidが変更前集合になければ、そのidは可視になる
 $array_idx = 0;
 $print_array = null;
+if(!isset($b_res)) $b_res = null;
 for($i=0; $i<count($b_res); $i++){
-  if($a_res==null||!in_array($b_res[$i], $a_res)){
+  if(!isset($a_res)||$a_res==null||!in_array($b_res[$i], $a_res)){
     $print_array[$array_idx++] = array("id"=>$b_res[$i]['id'],"name"=>$b_res[$i]['name']);
   }
 }
